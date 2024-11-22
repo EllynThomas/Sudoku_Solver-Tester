@@ -18,6 +18,17 @@ def print_board(board):
     
     print()
 
+def place_number(board, coord, number):
+    """
+    Places a number in a cell on the board
+    """
+    if board[coord[0]][coord[1]] != 0:
+        print(f"Cell ({coord[0]}, {coord[1]}) already filled")
+        return board
+    
+    board[coord[0]][coord[1]] = number
+    return board
+
 
 
 
@@ -28,25 +39,41 @@ def solve_step(board):
     The coordinates of the cell that was solved
     And returns the new board
     """
-
-    # Check if the board is solved
-    if check_fully_filled(board):
-        print("Board is already solved")
-        return board
-
+    '''
     # Check for sole candidate
     board, solved = sole_candidate(board)
     if solved:
         print("Sole candidate")
         print(f"Solved cell: {solved}")
         return board
-
+    '''
     # Check for last free cell
-    board, solved = last_free_cell(board)
-    if solved:
-        print("Last free cell")
-        print(f"Solved cell: {solved}")
-        return board
+    rows, cols, sqrs = get_incomplete_sets(board)
+    
+    for row in rows:
+        number, index = lfc_rule(row[0])
+        if number:
+            print("Last free cell")
+            print(f"{number} in : ({row[1]}, {index})")
+            return place_number(board, (row[1], index), number)
+       
+    for col in cols:
+        number, index = lfc_rule(col[0])
+        if number:
+            print("Last free cell")
+            print(f"{number} in : ({index}, {col[1]})")
+            return place_number(board, (index, col[1]), number)
+     
+            
+    for sqr in sqrs:
+        number, index = lfc_rule(sqr[0])
+        if number:
+            coord = get_coord_from_square(sqr[1], index)
+            print("Last free cell")
+            print(f"{number} in : ({coord[0]}, {coord[1]})")
+            return place_number(board, coord, number)
+
+
 
     # If no technique was used, return the board
     print("No technique used")
@@ -67,12 +94,12 @@ def select_board(board):
     # Very easy
     # only uses last free cell
     if board == 've1':
-        return     [[0, 3, 7, 1, 5, 2, 9, 4, 8],
+        return     [[0, 3, 7, 1, 5, 2, 9, 0, 8],
                     [1, 2, 9, 8, 4, 7, 5, 3, 6],
                     [5, 0, 8, 6, 3, 9, 7, 2, 1],
                     [9, 7, 3, 2, 1, 5, 8, 6, 4],
                     [4, 1, 5, 7, 6, 0, 2, 9, 3],
-                    [8, 6, 2, 4, 9, 3, 1, 5, 7],
+                    [8, 6, 2, 4, 9, 3, 1, 0, 7],
                     [3, 9, 1, 5, 8, 6, 4, 7, 2],
                     [2, 5, 4, 3, 7, 1, 6, 8, 0],
                     [7, 8, 0, 9, 2, 4, 3, 1, 5]]
@@ -156,9 +183,14 @@ def tests():
     board = select_board('ve1')
     print_board(board)
 
-    for i in range(5):
+    for i in range(8):
+        print('Step', i+1)
         board = solve_step(board)
+        print(' ')
+
+        # print_board(board)
     print_board(board)
+    print('Matches solution? ' +  str(board == select_board_solution('ve1')))
 
 
 if __name__ == '__main__':

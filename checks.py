@@ -8,10 +8,38 @@ def get_column(grid, col):
     # Returns column col from grid
     return [grid[i][col] for i in range(9)]
 
-def get_square(grid, square):
+def get_square(grid, sqr):
     # Returns square number 'square' from grid
     # Squares are numbered 0-8 from top left to bottom right
-    return [grid[(square // 3) * 3 + i][(square % 3) * 3 + j] for i in range(3) for j in range(3)]
+    return [grid[(sqr // 3) * 3 + i][(sqr % 3) * 3 + j] for i in range(3) for j in range(3)]
+
+def get_square_number(coord):
+    # returns the square number for a given coordinate
+    return 3 * (coord[0] // 3) + coord[1] // 3
+
+def get_coord_from_square(sqr_number, index):
+    # converts a square number and index to a coordinate
+    return 3 * (sqr_number // 3) + index // 3, 3 * (sqr_number % 3) + index % 3
+
+def get_empty_cells(grid):
+    # Returns list of coordinates of all empty cells
+    return [(i, j) for i in range(9) for j in range(9) if grid[i][j] == 0]
+
+def get_incomplete_sets(board):
+    # Returns list of incomplete sets
+    # returns a rows, columns, squares with its index
+
+    rows = [(get_row(board, i), i) for i in range(9)]
+    rows= [r for r in rows if 0 in r[0]]
+
+    cols = [(get_column(board, i), i) for i in range(9)]
+    cols = [c for c in cols if 0 in c[0]]
+
+    sqrs = [(get_square(board, i), i) for i in range(9)]
+    sqrs = [s for s in sqrs if 0 in s[0]]
+
+    return rows, cols, sqrs
+
 
 
 
@@ -72,13 +100,4 @@ def check_valid_partial(grid, mods = None):
         print('not implemented')
     
     return valid
-
-
-def check_fully_filled(grid):
-    # Returns True if grid is fully filled
-    for i in range(9):
-        for j in range(9):
-            if grid[i][j] == 0:
-                return False
-    return True
 
