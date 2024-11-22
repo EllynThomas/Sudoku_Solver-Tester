@@ -17,7 +17,7 @@ def pencil_marking(coord, grid):
     # returns list of numbers
     row = unfilled_numbers(get_row(grid, coord[0]))
     col = unfilled_numbers(get_column(grid, coord[1]))
-    square = unfilled_numbers(get_square(grid, coord[get_square_number(coord)]))
+    square = unfilled_numbers(get_square(grid, get_square_number(coord)))
 
     return list(set(row) & set(col) & set(square))
 

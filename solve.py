@@ -47,31 +47,62 @@ def solve_step(board):
         print(f"Solved cell: {solved}")
         return board
     '''
-    # Check for last free cell
+    # Check for Last Free Cell and Sole Candidate
     rows, cols, sqrs = get_incomplete_sets(board)
     
     for row in rows:
+        # Last free cell
         number, index = lfc_rule(row[0])
         if number:
             print("Last free cell")
             print(f"{number} in : ({row[1]}, {index})")
             return place_number(board, (row[1], index), number)
+        
+        # Sole candidate
+        incomplete_cells = get_incomplete_cells_index(row[0])
+        for cell in incomplete_cells:
+            number = sc_rule((row[1], cell), board)
+            if number:
+                print("Sole candidate")
+                print(f"{number} in : ({row[1]}, {cell})")
+                return place_number(board, (row[1], cell), number)
        
     for col in cols:
+        # Last free cell
         number, index = lfc_rule(col[0])
         if number:
             print("Last free cell")
             print(f"{number} in : ({index}, {col[1]})")
             return place_number(board, (index, col[1]), number)
+        
+        # Sole candidate
+        incomplete_cells = get_incomplete_cells_index(col[0])
+        for cell in incomplete_cells:
+            number = sc_rule((cell, col[1]), board)
+            if number:
+                print("Sole candidate")
+                print(f"{number} in : ({cell}, {col[1]})")
+                return place_number(board, (cell, col[1]), number)
      
             
     for sqr in sqrs:
+        # Last free cell
         number, index = lfc_rule(sqr[0])
         if number:
             coord = get_coord_from_square(sqr[1], index)
             print("Last free cell")
             print(f"{number} in : ({coord[0]}, {coord[1]})")
             return place_number(board, coord, number)
+        
+        # Sole candidate
+        incomplete_cells = get_incomplete_cells_index(sqr[0])
+        for cell in incomplete_cells:
+            coord = get_coord_from_square(sqr[1], cell)
+            number = sc_rule(coord, board)
+            if number:
+                print("Sole candidate")
+                print(f"{number} in : ({coord[0]}, {coord[1]})")
+                return place_number(board, coord, number)
 
 
 
@@ -180,17 +211,20 @@ def tests():
     """
 
     # Very easy 1
-    board = select_board('ve1')
+    board = select_board('e1')
     print_board(board)
 
-    for i in range(8):
+    for i in range(81):
         print('Step', i+1)
         board = solve_step(board)
         print(' ')
 
-        # print_board(board)
+        print_board(board)
+        if check_valid_solution(board):
+            print('Solved')
+            break
     print_board(board)
-    print('Matches solution? ' +  str(board == select_board_solution('ve1')))
+    print('Matches solution? ' +  str(board == select_board_solution('e1')))
 
 
 if __name__ == '__main__':

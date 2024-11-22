@@ -40,7 +40,9 @@ def get_incomplete_sets(board):
 
     return rows, cols, sqrs
 
-
+def get_incomplete_cells_index(s):
+    # Returns list of indexes of incomplete cells
+    return [i for i in range(9) if s[i] == 0]
 
 
 def check_complete_set(s):
