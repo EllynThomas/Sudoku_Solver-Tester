@@ -74,3 +74,11 @@ def check_valid_partial(grid, mods = None):
     return valid
 
 
+def check_fully_filled(grid):
+    # Returns True if grid is fully filled
+    for i in range(9):
+        for j in range(9):
+            if grid[i][j] == 0:
+                return False
+    return True
+
