@@ -1,5 +1,5 @@
 
-
+### Functions for getting rows, columns, squares ###
 def get_row(grid, row):
     # Returns row row from grid
     return grid[row]
@@ -21,9 +21,21 @@ def get_coord_from_square(sqr_number, index):
     # converts a square number and index to a coordinate
     return 3 * (sqr_number // 3) + index // 3, 3 * (sqr_number % 3) + index % 3
 
+def get_square_index(coord):
+    # returns the index of a cell in a square
+    return 3 * (coord[0] % 3) + coord[1] % 3
+
+
+
+### Functions for getting incomplete cells and sets ###
+
 def get_empty_cells(grid):
     # Returns list of coordinates of all empty cells
     return [(i, j) for i in range(9) for j in range(9) if grid[i][j] == 0]
+
+def get_incomplete_cells_index(s):
+    # Returns list of indexes of incomplete cells in a set
+    return [i for i in range(9) if s[i] == 0]
 
 def get_incomplete_sets(board):
     # Returns list of incomplete sets
@@ -40,10 +52,14 @@ def get_incomplete_sets(board):
 
     return rows, cols, sqrs
 
-def get_incomplete_cells_index(s):
-    # Returns list of indexes of incomplete cells
-    return [i for i in range(9) if s[i] == 0]
 
+
+
+
+
+
+
+### Functions for checking validity ###
 
 def check_complete_set(s):
     # Returns True if set contains ONLY 1-9 with no duplicates
@@ -54,9 +70,7 @@ def check_partial_set(s):
     for i in range(8):
         if s[i] != 0 and s[i] in s[i+1:]:
             return False
-    return True
-    
-
+    return True   
 
 def check_valid_solution(grid, mods = None):
     # Checks if full grid is a valid solution
@@ -79,7 +93,6 @@ def check_valid_solution(grid, mods = None):
         print('not implemented')
     
     return valid
-
 
 def check_valid_partial(grid, mods = None):
     # Checks if partial grid is valid

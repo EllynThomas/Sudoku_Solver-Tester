@@ -51,6 +51,7 @@ def solve_step(board):
     rows, cols, sqrs = get_incomplete_sets(board)
     
     for row in rows:
+        
         # Last free cell
         number, index = lfc_rule(row[0])
         if number:
@@ -58,17 +59,29 @@ def solve_step(board):
             print(f"{number} in : ({row[1]}, {index})")
             return place_number(board, (row[1], index), number)
         
+        
         # Sole candidate
         incomplete_cells = get_incomplete_cells_index(row[0])
+        
         for cell in incomplete_cells:
             number = sc_rule((row[1], cell), board)
             if number:
                 print("Sole candidate")
                 print(f"{number} in : ({row[1]}, {cell})")
                 return place_number(board, (row[1], cell), number)
+        
+            
+        # Unique candidate
+        for cell in incomplete_cells:
+            number = uc_rule((row[1], cell), board)
+            if number:
+                print("Unique candidate")
+                print(f"{number} in : ({row[1]}, {cell})")
+                return place_number(board, (row[1], cell), number)
        
     for col in cols:
         # Last free cell
+        
         number, index = lfc_rule(col[0])
         if number:
             print("Last free cell")
@@ -77,16 +90,26 @@ def solve_step(board):
         
         # Sole candidate
         incomplete_cells = get_incomplete_cells_index(col[0])
+        
         for cell in incomplete_cells:
             number = sc_rule((cell, col[1]), board)
             if number:
                 print("Sole candidate")
                 print(f"{number} in : ({cell}, {col[1]})")
                 return place_number(board, (cell, col[1]), number)
+            
+        # Unique candidate
+        for cell in incomplete_cells:
+            number = uc_rule((cell, col[1]), board)
+            if number:
+                print("Unique candidate")
+                print(f"{number} in : ({cell}, {col[1]})")
+                return place_number(board, (cell, col[1]), number)
      
             
     for sqr in sqrs:
         # Last free cell
+        
         number, index = lfc_rule(sqr[0])
         if number:
             coord = get_coord_from_square(sqr[1], index)
@@ -96,11 +119,21 @@ def solve_step(board):
         
         # Sole candidate
         incomplete_cells = get_incomplete_cells_index(sqr[0])
+        
         for cell in incomplete_cells:
             coord = get_coord_from_square(sqr[1], cell)
             number = sc_rule(coord, board)
             if number:
                 print("Sole candidate")
+                print(f"{number} in : ({coord[0]}, {coord[1]})")
+                return place_number(board, coord, number)
+            
+        # Unique candidate
+        for cell in incomplete_cells:
+            coord = get_coord_from_square(sqr[1], cell)
+            number = uc_rule(coord, board)
+            if number:
+                print("Unique candidate")
                 print(f"{number} in : ({coord[0]}, {coord[1]})")
                 return place_number(board, coord, number)
 
@@ -123,8 +156,10 @@ def select_board(board):
     """
 
     # Very easy
-    # only uses last free cell
+    
     if board == 've1':
+        # Only requires last free cell
+        # 5 steps
         return     [[0, 3, 7, 1, 5, 2, 9, 0, 8],
                     [1, 2, 9, 8, 4, 7, 5, 3, 6],
                     [5, 0, 8, 6, 3, 9, 7, 2, 1],
@@ -137,8 +172,10 @@ def select_board(board):
     
 
     # Easy
-    # Uses last free cell and sole candidate
+    
     elif board == 'e1':
+        # Also requires sole candidate
+        # 45 steps
         return     [[0, 0, 7, 0, 0, 2, 0, 4, 8],
                     [1, 2, 9, 8, 0, 0, 0, 0, 0],
                     [0, 0, 8, 6, 3, 0, 7, 0, 1],
@@ -151,6 +188,8 @@ def select_board(board):
     
 
     elif board == 'h1':
+        # Also requires unique candidate, + more
+        # 60 steps
         return [[0, 6, 0, 3, 0, 0, 0, 0, 0],
                 [9, 0, 0, 0, 6, 2, 0, 5, 0],
                 [0, 0, 0, 8, 7, 0, 0, 0, 2],
@@ -211,15 +250,15 @@ def tests():
     """
 
     # Very easy 1
-    board = select_board('e1')
+    board = select_board('h1')
     print_board(board)
 
-    for i in range(81):
+    for i in range(10):
         print('Step', i+1)
         board = solve_step(board)
         print(' ')
 
-        print_board(board)
+        # print_board(board)
         if check_valid_solution(board):
             print('Solved')
             break

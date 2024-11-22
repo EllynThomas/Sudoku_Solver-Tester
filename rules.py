@@ -11,7 +11,6 @@ def unfilled_numbers(s):
     return [i for i in range(1, 10) if i not in s]
 
 
-
 def pencil_marking(coord, grid):
     # Returns a list of possible numbers that can go in a cell
     # returns list of numbers
@@ -36,17 +35,7 @@ def lfc_rule(s):
         return unfilled[0], s.index(0)
     return None, None
 
-def uc_rule(s, grid):
-    # Unique Candidate Rule
-    # Only one cell in a row, column or square can contain a number
-    # returns number and index if true, else returns None
-    empty_cells = [i for i in range(9) if s[i] == 0]
-    pencil_set = [pencil_marking((i, s.index(0)), grid) for i in empty_cells]
 
-    for i in range(1, 10):
-        if sum([i in p for p in pencil_set]) == 1:
-            return i, empty_cells[pencil_set.index([i])]
-    return None, None
 
 
 ### Cell Techniques ###
@@ -63,6 +52,39 @@ def sc_rule(coord, grid):
 
 
 
+#### Change to cell technique
+def uc_rule(coord, grid):
+    # Unique Candidate Rule
+    # Only one cell in a row, column or square can contain a number
+    # returns number and index if true, else returns None
+    candidates = pencil_marking(coord, grid)
+
+    row = get_row(grid, coord[0])
+    col = get_column(grid, coord[1])
+    sqr = get_square(grid, get_square_number(coord))
+
+    row_pencil = set()
+    col_pencil = set()
+    sqr_pencil = set()
+
+    sqr_num = get_square_number(coord)
+    sqr_i = get_square_index(coord)
+    
+
+    for i in range(9):
+        if row[i] == 0 and i != coord[1]:
+            row_pencil.update(pencil_marking((coord[0], i), grid))
+        if col[i] == 0 and i != coord[0]:
+            col_pencil.update(pencil_marking((i, coord[1]), grid))
+        if sqr[i] == 0 and i != sqr_i:
+            sqr_pencil.update(pencil_marking(get_coord_from_square(sqr_num, i), grid))
+
+        
+
+    for candidate in candidates:
+        if candidate not in row_pencil or candidate not in col_pencil or candidate not in sqr_pencil:
+            return candidate
+        
 
 
 
