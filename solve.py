@@ -1,38 +1,55 @@
 from checks import *
 from rules import *
+from grid import *
 
-def print_board(board):
+
+def do_rule(rule, grid, pencil_grid):
     """
-    Prints a sudoku board
+    Evaluates a rule to a grid
+    Prints the rule, number, coord if applied
+    Returns True if the rule was applied
     """
-    print(''.join(['-' for i in range(25)]))
-    for i in range(9):
-        print('|', end = '')
-        for j in range(9):
-            print(f' {board[i][j]}', end = '')
-            if j % 3 == 2:
-                print(' |', end = '')
-        print()
-        if i % 3 == 2:
-            print(''.join(['-' for i in range(25)]))
-    
-    print()
+    if isinstance(rule, CellRule):
+        empty_cells = grid.empty_cells()
+        for cell in empty_cells:
+            number = rule.evaluate(cell, grid)
+            if number:
+                print(rule.str())
+                print(f"{number} in : {cell}")
+                return True
+            
+    elif isinstance(rule, SetRule):
+        rows, cols, sqrs = grid.incomplete_sets()
+        
+        for row in rows:
+            number, index = rule.evaluate(row, grid)
+            if number:
+                print(rule.str())
+                coord = (row[1], index)
+                print(f"{number} in : {coord}")
+                return True
+        
+        for col in cols:
+            number, index = rule.evaluate(col, grid)
+            if number:
+                print(rule.str())
+                coord = (index, col[1])
+                print(f"{number} in : {coord}")
+                return True
+        
+        for sqr in sqrs:
+            number, index = rule.evaluate(sqr, grid)
+            if number:
+                print(rule.str())
+                coord = grid.square_coord(sqr[1], index)
+                print(f"{number} in : {index}")
+                return True
+            
+    else:
+        return False
 
-def place_number(board, coord, number):
-    """
-    Places a number in a cell on the board
-    """
-    if board[coord[0]][coord[1]] != 0:
-        print(f"Cell ({coord[0]}, {coord[1]}) already filled")
-        return board
-    
-    board[coord[0]][coord[1]] = number
-    return board
 
-
-
-
-def solve_step(board):
+def solve_step(grid, pencil_grid):
     """
     Solves a single step of a sudoku board.
     Prints what technique was used to solve the step
@@ -47,101 +64,22 @@ def solve_step(board):
         print(f"Solved cell: {solved}")
         return board
     '''
-    # Check for Last Free Cell and Sole Candidate
-    rows, cols, sqrs = get_incomplete_sets(board)
+    # Check for naked single
+    if do_rule(ns_rule(), grid, pencil_grid):
+        return grid
     
-    for row in rows:
-        
-        # Last free cell
-        number, index = lfc_rule(row[0])
-        if number:
-            print("Last free cell")
-            print(f"{number} in : ({row[1]}, {index})")
-            return place_number(board, (row[1], index), number)
-        
-        
-        # Sole candidate
-        incomplete_cells = get_incomplete_cells_index(row[0])
-        
-        for cell in incomplete_cells:
-            number = sc_rule((row[1], cell), board)
-            if number:
-                print("Sole candidate")
-                print(f"{number} in : ({row[1]}, {cell})")
-                return place_number(board, (row[1], cell), number)
-        
-            
-        # Unique candidate
-        for cell in incomplete_cells:
-            number = uc_rule((row[1], cell), board)
-            if number:
-                print("Unique candidate")
-                print(f"{number} in : ({row[1]}, {cell})")
-                return place_number(board, (row[1], cell), number)
-       
-    for col in cols:
-        # Last free cell
-        
-        number, index = lfc_rule(col[0])
-        if number:
-            print("Last free cell")
-            print(f"{number} in : ({index}, {col[1]})")
-            return place_number(board, (index, col[1]), number)
-        
-        # Sole candidate
-        incomplete_cells = get_incomplete_cells_index(col[0])
-        
-        for cell in incomplete_cells:
-            number = sc_rule((cell, col[1]), board)
-            if number:
-                print("Sole candidate")
-                print(f"{number} in : ({cell}, {col[1]})")
-                return place_number(board, (cell, col[1]), number)
-            
-        # Unique candidate
-        for cell in incomplete_cells:
-            number = uc_rule((cell, col[1]), board)
-            if number:
-                print("Unique candidate")
-                print(f"{number} in : ({cell}, {col[1]})")
-                return place_number(board, (cell, col[1]), number)
-     
-            
-    for sqr in sqrs:
-        # Last free cell
-        
-        number, index = lfc_rule(sqr[0])
-        if number:
-            coord = get_coord_from_square(sqr[1], index)
-            print("Last free cell")
-            print(f"{number} in : ({coord[0]}, {coord[1]})")
-            return place_number(board, coord, number)
-        
-        # Sole candidate
-        incomplete_cells = get_incomplete_cells_index(sqr[0])
-        
-        for cell in incomplete_cells:
-            coord = get_coord_from_square(sqr[1], cell)
-            number = sc_rule(coord, board)
-            if number:
-                print("Sole candidate")
-                print(f"{number} in : ({coord[0]}, {coord[1]})")
-                return place_number(board, coord, number)
-            
-        # Unique candidate
-        for cell in incomplete_cells:
-            coord = get_coord_from_square(sqr[1], cell)
-            number = uc_rule(coord, board)
-            if number:
-                print("Unique candidate")
-                print(f"{number} in : ({coord[0]}, {coord[1]})")
-                return place_number(board, coord, number)
-
+    # Check for unique candidate
+    if do_rule(uc_rule(), grid, pencil_grid):
+        return grid
+    
+    # Check for last free cell
+    if do_rule(lfc_rule(), grid, pencil_grid):
+        return grid
 
 
     # If no technique was used, return the board
     print("No technique used")
-    return board
+    return grid
 
 
 
@@ -250,19 +188,22 @@ def tests():
     """
 
     # Very easy 1
-    board = select_board('h1')
-    print_board(board)
+    board = Grid(select_board('e1'))
+    pencil = Pencil_Grid(board)
+    board.print_grid()
+    print(' ')
 
-    for i in range(10):
+
+    for i in range(45):
         print('Step', i+1)
-        board = solve_step(board)
+        board = solve_step(board, pencil)
         print(' ')
 
         # print_board(board)
         if check_valid_solution(board):
             print('Solved')
             break
-    print_board(board)
+    board.print_grid()
     print('Matches solution? ' +  str(board == select_board_solution('e1')))
 
 
