@@ -24,15 +24,13 @@ class Sub_Grid:
         self.update(grid)
         self.covered = []
 
-    def __call__(self): 
-        return self.sub_grid
 
     def update(self, grid):
         # Updates the subgrid to the current state of the grid
 
 
         if self.sub_grid_type == SG_Type.ROW:
-            self.sub_grid = grid[self.sub_grid_number]
+            self.sub_grid = grid[self.sub_grSid_number]
         elif self.sub_grid_type == SG_Type.COLUMN:
             self.sub_grid = [grid[i][self.sub_grid_number] for i in range(9)]
         elif self.sub_grid_type == SG_Type.SQUARE:

@@ -17,25 +17,21 @@ def check_partial_set(s):
 def check_valid_solution(grid, mods = None):
     # Checks if full grid is a valid solution
     # mods is list of additional constraints and their grids
-    valid = True
 
     
     for i in range(9):
         if not check_complete_set(Sub_Grid(grid, SG_Type.ROW, i)()):
-            valid = False
+            return False
         if not check_complete_set(Sub_Grid(grid, SG_Type.COLUMN, i)()):
-            valid = False
+            return False
         if not check_complete_set(Sub_Grid(grid, SG_Type.SQUARE, i)()):
-            valid = False
-
-        if not valid:
             return False
     
     if mods:
         print('Checking additional constraints')
         print('not implemented')
     
-    return valid
+    return True
 
 def check_valid_partial(grid, mods = None):
     # Checks if partial grid is valid

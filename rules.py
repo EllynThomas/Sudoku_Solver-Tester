@@ -48,8 +48,8 @@ class uc_rule(CellRule):
     # Unique Candidate Rule
     # Only one cell in a row, column or square can contain a number
     # Updates a cell if applicable and returns number, coord if true, else returns None, None
-    def evaluate(self, coord, grid, pencil_grid):
-        pencil = pencil_grid.cell(coord)
+    def evaluate(self, coord, grid):
+        pencil = grid.pencil_cell(coord)
         
         row_sg_pencil = self.cover_and_check(coord, grid, SG_Type.ROW)
         
@@ -59,7 +59,7 @@ class uc_rule(CellRule):
 
         for candidate in pencil:
             if candidate not in row_sg_pencil or candidate not in col_sg_pencil or candidate not in sqr_sg_pencil:
-                Grid.update_cell(coord, candidate)
+                grid.update_cell(coord, candidate)
                 return candidate, coord
         
         return None, None
@@ -69,7 +69,7 @@ class uc_rule(CellRule):
     
     def cover_and_check(self, coord, grid, sg_type):
         # covers the cell in at the coord and returns the set of candidates
-        sub_grid = Sub_Grid(sg_type, coord)
+        sub_grid = Sub_Grid(sg_type, coord, grid)
 
         sub_grid.cover(coord)
         return grid.pencil_sub_grid(sub_grid)

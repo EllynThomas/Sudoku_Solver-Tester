@@ -13,7 +13,7 @@ def do_rule(rule, grid):
         empty_cells = grid.empty_cells()
         for cell in empty_cells:
             number = rule.evaluate(cell, grid)
-            if number:
+            if number[0]:
                 print(rule)
                 print(f"{number} in : {cell}")
                 return True
@@ -23,7 +23,7 @@ def do_rule(rule, grid):
         
         for row in rows:
             number, index = rule.evaluate(row, grid)
-            if number:
+            if number[0]:
                 print(rule)
                 coord = (row[1], index)
                 print(f"{number} in : {coord}")
@@ -31,7 +31,7 @@ def do_rule(rule, grid):
         
         for col in cols:
             number, index = rule.evaluate(col, grid)
-            if number:
+            if number[0]:
                 print(rule)
                 coord = (index, col[1])
                 print(f"{number} in : {coord}")
