@@ -18,6 +18,7 @@ def check_valid_solution(grid, mods = None):
     # Checks if full grid is a valid solution
     # mods is list of additional constraints and their grids
     valid = True
+
     
     for i in range(9):
         if not check_complete_set(Sub_Grid(grid, SG_Type.ROW, i)()):

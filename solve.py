@@ -3,7 +3,7 @@ from rules import *
 from grid import *
 
 
-def do_rule(rule, grid, pencil_grid):
+def do_rule(rule, grid):
     """
     Evaluates a rule to a grid
     Prints the rule, number, coord if applied
@@ -14,7 +14,7 @@ def do_rule(rule, grid, pencil_grid):
         for cell in empty_cells:
             number = rule.evaluate(cell, grid)
             if number:
-                print(rule.str())
+                print(rule)
                 print(f"{number} in : {cell}")
                 return True
             
@@ -24,7 +24,7 @@ def do_rule(rule, grid, pencil_grid):
         for row in rows:
             number, index = rule.evaluate(row, grid)
             if number:
-                print(rule.str())
+                print(rule)
                 coord = (row[1], index)
                 print(f"{number} in : {coord}")
                 return True
@@ -32,7 +32,7 @@ def do_rule(rule, grid, pencil_grid):
         for col in cols:
             number, index = rule.evaluate(col, grid)
             if number:
-                print(rule.str())
+                print(rule)
                 coord = (index, col[1])
                 print(f"{number} in : {coord}")
                 return True
@@ -40,7 +40,7 @@ def do_rule(rule, grid, pencil_grid):
         for sqr in sqrs:
             number, index = rule.evaluate(sqr, grid)
             if number:
-                print(rule.str())
+                print(rule)
                 coord = grid.square_coord(sqr[1], index)
                 print(f"{number} in : {index}")
                 return True
@@ -49,31 +49,21 @@ def do_rule(rule, grid, pencil_grid):
         return False
 
 
-def solve_step(grid, pencil_grid):
+def solve_step(grid):
     """
     Solves a single step of a sudoku board.
-    Prints what technique was used to solve the step
-    The coordinates of the cell that was solved
-    And returns the new board
+    Returns the updated grid
     """
-    '''
-    # Check for sole candidate
-    board, solved = sole_candidate(board)
-    if solved:
-        print("Sole candidate")
-        print(f"Solved cell: {solved}")
-        return board
-    '''
     # Check for naked single
-    if do_rule(ns_rule(), grid, pencil_grid):
+    if do_rule(ns_rule(), grid):
         return grid
     
     # Check for unique candidate
-    if do_rule(uc_rule(), grid, pencil_grid):
+    if do_rule(uc_rule(), grid):
         return grid
     
     # Check for last free cell
-    if do_rule(lfc_rule(), grid, pencil_grid):
+    if do_rule(lfc_rule(), grid):
         return grid
 
 
@@ -187,16 +177,15 @@ def tests():
     Runs tests for the solve_step function
     """
 
-    # Very easy 1
+    # easy 1
     board = Grid(select_board('e1'))
-    pencil = Pencil_Grid(board)
     board.print_grid()
     print(' ')
 
 
     for i in range(45):
         print('Step', i+1)
-        board = solve_step(board, pencil)
+        board = solve_step(board)
         print(' ')
 
         # print_board(board)

@@ -19,23 +19,24 @@ class Sub_Grid:
         elif sub_grid_type == SG_Type.SQUARE:
             self.sub_grid_number = 3 * (coord[0] // 3) + coord[1] // 3
 
-        self.sub_grid = Sub_Grid.update(grid)
+        self.sub_grid = None
 
+        self.update(grid)
         self.covered = []
 
+    def __call__(self): 
+        return self.sub_grid
 
     def update(self, grid):
         # Updates the subgrid to the current state of the grid
 
-        if 'C' in grid[self.sub_grid_number]:
-            raise ValueError("Covered cell in subgrid")
 
         if self.sub_grid_type == SG_Type.ROW:
             self.sub_grid = grid[self.sub_grid_number]
         elif self.sub_grid_type == SG_Type.COLUMN:
-            self.sub_grid = [self.grid[i][self.sub_grid_number] for i in range(9)]
+            self.sub_grid = [grid[i][self.sub_grid_number] for i in range(9)]
         elif self.sub_grid_type == SG_Type.SQUARE:
-            self.sub_grid = [self.grid[(self.sub_grid_number // 3) * 3 + i][(self.sub_grid_number % 3) * 3 + j] for i in range(3) for j in range(3)]
+            self.sub_grid = [grid[(self.sub_grid_number // 3) * 3 + i][(self.sub_grid_number % 3) * 3 + j] for i in range(3) for j in range(3)]
 
     def __call__(self):
         return self.sub_grid
@@ -59,6 +60,8 @@ class Sub_Grid:
     def candidates(self):
         # returns a list of all the numbers that are not 
         # filled in the set
+        if not self.sub_grid:
+            raise ValueError("Subgrid not updated")
         return [i for i in range(1, 10) if i not in self.sub_grid]
     
     def coord(self, index):
@@ -91,78 +94,39 @@ class Sub_Grid:
                 raise ValueError("Coordinate not in square")
             return 3 * (coord[0] % 3) + coord[1] % 3
         
-class Pencil_Grid:
-    # Pencil marking for a grid
-
-    def __init__(self, grid):
-        
-        for i in range(9):
-            for j in range(9):
-                if grid[i][j] != 0:
-                    self.grid[i][j] = 'F'
-                else:
-                    self.grid[i][j] = [k for k in range(1, 10)]
-
-    def remove(self, coord, number):
-        # Removes number from pencil marks
-        if number in self.grid[coord[0]][coord[1]]:
-            self.grid[coord[0]][coord[1]].remove(number)
-            
-
-    def cell(self, coord):
-        # Returns the pencil marks of the cell
-        Pencil_Grid.prune(coord)
-        return self.grid[coord[0]][coord[1]]
-    
-    def sub_grid(self, sub_grid):
-        # Returns a set of all pencil marks of the subgrid
-        coords = sub_grid.coord_list()
-        pencils = set()
-        for coord in coords:
-            if Pencil_Grid.cell(coord) != 'F':
-                pencils.update(Pencil_Grid.cell(coord))
-        return pencils
-
-    
-    def fill(self, coord):
-        # Fills in the pencil mark cell
-        self.grid[coord[0]][coord[1]] = 'F'
-    
-    def prune(self, coord):
-        # Removes pencil marks if the number is already in any
-        # of the subgrids of the cell
-        row = Sub_Grid(SG_Type.ROW, coord)
-        col = Sub_Grid(SG_Type.COLUMN, coord)
-        sqr = Sub_Grid(SG_Type.SQUARE, coord)
-
-        candidates = set(row.candidates() + col.candidates() + sqr.candidates())
-        self.pencil = [i for i in self.pencil if i in candidates]
-    
-    def remove_subgrids(self, coord, number):
-        # Removes pencil marks of all pencil marks in the subgrids
-        # of the cell
-
-        for i in range(9):
-            if number in self.pencil_grid[coord[0]][i]:
-                self.pencil_grid[coord[0]][i].remove(number)
-
-            if number in self.pencil_grid[i][coord[1]]:
-                self.pencil_grid[i][coord[1]].remove(number)
-
-            if number in self.pencil_grid[3 * (coord[0] // 3) + i // 3][3 * (coord[1] // 3) + i % 3]:
-                self.pencil_grid[3 * (coord[0] // 3) + i // 3][3 * (coord[1] // 3) + i % 3].remove(number)
-
 
 class Grid:
     # Grid of the pencil markings of a sudoku puzzle
 
     def __init__(self, grid):
-
         self.grid = grid
-        self.pencil_grid = grid.copy()
+        
+        self.pencil_grid = [[[] for i in range(9)] for j in range(9)]
 
-        # Initialize pencil grid with all possible numbers
-        print("Grid initialized")
+        for i in range(9):
+            for j in range(9):
+                if grid[i][j] != 0:
+                    self.pencil_grid[i][j] = 'F'
+                else:
+                    self.pencil_grid[i][j] = [k for k in range(1, 10)]
+
+    def __call__(self):
+        return self.grid
+
+    def print_grid(self):
+        # Prints the grid
+        print(''.join(['-' for i in range(25)]))
+        for i in range(9):
+            print('|', end = '')
+            for j in range(9):
+                print(f' {self.grid[i][j]}', end = '')
+                if j % 3 == 2:
+                    print(' |', end = '')
+            print()
+            if i % 3 == 2:
+                print(''.join(['-' for i in range(25)]))
+        
+        print()
 
     def square_number(coord):
         # Returns the square number of the cell at coord
@@ -176,14 +140,14 @@ class Grid:
         # Returns the coordinate of the cell in the square
         return 3 * (sqr_num // 3) + index // 3, 3 * (sqr_num % 3) + index % 3
     
-    def update_cell(self, coord, number, pencil):
+    def update_cell(self, coord, number):
         # Updates the grid with the number at the coordinate
 
         if self.grid[coord[0]][coord[1]] != 0:
             raise ValueError("Cell already filled")
         
         self.grid[coord[0]][coord[1]] = number
-        pencil.fill(coord)
+        self.pencil_fill(coord)
 
 
 
@@ -211,20 +175,62 @@ class Grid:
         return rows, cols, sqrs
 
 
-    def print_grid(self):
-        # Prints the grid
-        print(''.join(['-' for i in range(25)]))
+
+    
+
+    ### PENCIL FUNCTIONS ###
+
+    def pencil_remove(self, coord, number):
+        # Removes number from pencil marks
+        if number in self.grid[coord[0]][coord[1]]:
+            self.grid[coord[0]][coord[1]].remove(number)
+            
+
+    def pencil_cell(self, coord):
+        # Returns the pencil marks of the cell
+        self.pencil_prune(coord)
+        return self.pencil_grid[coord[0]][coord[1]]
+    
+    def pencil_sub_grid(self, sub_grid):
+        # Returns a set of all pencil marks of the subgrid
+        coords = sub_grid.coord_list()
+        pencils = set()
+        for coord in coords:
+            if self.pencil_cell(coord) != 'F':
+                pencils.update(self.Pencil.cell(coord))
+        return pencils
+
+    
+    def pencil_fill(self, coord):
+        # Fills in the pencil mark cell
+        self.grid[coord[0]][coord[1]] = 'F'
+    
+    def pencil_prune(self, coord):
+        # Removes pencil marks if the number is already in any
+        # of the subgrids of the cell
+        row = Sub_Grid(SG_Type.ROW, coord, self.grid)
+        col = Sub_Grid(SG_Type.COLUMN, coord, self.grid)
+        sqr = Sub_Grid(SG_Type.SQUARE, coord, self.grid)
+
+        candidates = set(row.candidates() + col.candidates() + sqr.candidates())
+        self.pencil_grid[coord[0]][coord[1]] = [i for i in self.pencil_grid[coord[0]][coord[1]] if i in candidates]
+    
+    def pencil_remove_subgrids(self, coord, number):
+        # Removes pencil marks of all pencil marks in the subgrids
+        # of the cell
+
         for i in range(9):
-            print('|', end = '')
-            for j in range(9):
-                print(f' {self.grid[i][j]}', end = '')
-                if j % 3 == 2:
-                    print(' |', end = '')
-            print()
-            if i % 3 == 2:
-                print(''.join(['-' for i in range(25)]))
-        
-        print()
+            if number in self.pencil_grid[coord[0]][i]:
+                self.pencil_grid[coord[0]][i].remove(number)
+
+            if number in self.pencil_grid[i][coord[1]]:
+                self.pencil_grid[i][coord[1]].remove(number)
+
+            if number in self.pencil_grid[3 * (coord[0] // 3) + i // 3][3 * (coord[1] // 3) + i % 3]:
+                self.pencil_grid[3 * (coord[0] // 3) + i // 3][3 * (coord[1] // 3) + i % 3].remove(number)
+
+
+
 
 
 
