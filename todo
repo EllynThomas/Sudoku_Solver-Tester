@@ -1,0 +1,39 @@
+[] Change pencil marking to be an entire grid.
+[] Update Naked Single and Hidden single rule to evaluate based off this grid.
+
+
+
+
+
+
+
+
+
+
+
+RULES:
+
+Singles
+[x] Full House  - house rule
+[x] Hidden Single  - cell rule
+[x] Naked Single  - cell rule
+
+Intersections
+[ ] Locked Candidates 
+[ ] Locked Pair 
+[ ] Locked Triple ?
+
+Subsets
+[ ] Naked Pair
+[ ] Naked Triple/Quad ?
+[ ] Hidden Pair
+[ ] Hidden Triple/Quad ?
+
+Fish
+[ ] Basic Fish ?
+[ ] X-Wing
+[ ] Y-Wing ?
+[ ] Swordfish ?
+[ ] Finned fish ?
+
+Uniqueness ?

@@ -40,69 +40,72 @@ def solve_step(board):
     And returns the new board
     """
     '''
-    # Check for sole candidate
+    # Check for Naked_Single
     board, solved = sole_candidate(board)
     if solved:
-        print("Sole candidate")
+        print("Naked_Single")
         print(f"Solved cell: {solved}")
         return board
     '''
-    # Check for Last Free Cell and Sole Candidate
+    # Check for Last Free Cell and Naked_Single
     rows, cols, sqrs = get_incomplete_sets(board)
+    full_house = Full_House()
+    naked_single = Naked_Single()
+    hidden_single = Hidden_Single()
     
     for row in rows:
         
-        # Last free cell
-        number, index = lfc_rule(row[0])
+        # Full House
+        number, index = full_house.evaluate(row[0])
         if number:
-            print("Last free cell")
+            print("Full House")
             print(f"{number} in : ({row[1]}, {index})")
             return place_number(board, (row[1], index), number)
         
         
-        # Sole candidate
+        # Naked Single
         incomplete_cells = get_incomplete_cells_index(row[0])
         
         for cell in incomplete_cells:
-            number = sc_rule((row[1], cell), board)
+            number = naked_single.evaluate((row[1], cell), board)
             if number:
-                print("Sole candidate")
+                print("Naked_Single")
                 print(f"{number} in : ({row[1]}, {cell})")
                 return place_number(board, (row[1], cell), number)
         
             
-        # Unique candidate
+        # Hidden Single
         for cell in incomplete_cells:
-            number = uc_rule((row[1], cell), board)
+            number = hidden_single.evaluate((row[1], cell), board)
             if number:
-                print("Unique candidate")
+                print("Hidden Single")
                 print(f"{number} in : ({row[1]}, {cell})")
                 return place_number(board, (row[1], cell), number)
        
     for col in cols:
         # Last free cell
         
-        number, index = lfc_rule(col[0])
+        number, index = full_house.evaluate(col[0])
         if number:
             print("Last free cell")
             print(f"{number} in : ({index}, {col[1]})")
             return place_number(board, (index, col[1]), number)
         
-        # Sole candidate
+        # Naked_Single
         incomplete_cells = get_incomplete_cells_index(col[0])
         
         for cell in incomplete_cells:
-            number = sc_rule((cell, col[1]), board)
+            number = naked_single.evaluate((cell, col[1]), board)
             if number:
-                print("Sole candidate")
+                print("Naked_Single")
                 print(f"{number} in : ({cell}, {col[1]})")
                 return place_number(board, (cell, col[1]), number)
             
-        # Unique candidate
+        # Hidden Single
         for cell in incomplete_cells:
-            number = uc_rule((cell, col[1]), board)
+            number = hidden_single.evaluate((cell, col[1]), board)
             if number:
-                print("Unique candidate")
+                print("Hidden Single")
                 print(f"{number} in : ({cell}, {col[1]})")
                 return place_number(board, (cell, col[1]), number)
      
@@ -110,30 +113,30 @@ def solve_step(board):
     for sqr in sqrs:
         # Last free cell
         
-        number, index = lfc_rule(sqr[0])
+        number, index = full_house.evaluate(sqr[0])
         if number:
             coord = get_coord_from_square(sqr[1], index)
             print("Last free cell")
             print(f"{number} in : ({coord[0]}, {coord[1]})")
             return place_number(board, coord, number)
         
-        # Sole candidate
+        # Naked_Single
         incomplete_cells = get_incomplete_cells_index(sqr[0])
         
         for cell in incomplete_cells:
             coord = get_coord_from_square(sqr[1], cell)
-            number = sc_rule(coord, board)
+            number = naked_single.evaluate(coord, board)
             if number:
-                print("Sole candidate")
+                print("Naked_Single")
                 print(f"{number} in : ({coord[0]}, {coord[1]})")
                 return place_number(board, coord, number)
             
-        # Unique candidate
+        # Hidden Single
         for cell in incomplete_cells:
             coord = get_coord_from_square(sqr[1], cell)
-            number = uc_rule(coord, board)
+            number = hidden_single.evaluate(coord, board)
             if number:
-                print("Unique candidate")
+                print("Hidden Single")
                 print(f"{number} in : ({coord[0]}, {coord[1]})")
                 return place_number(board, coord, number)
 
@@ -174,7 +177,7 @@ def select_board(board):
     # Easy
     
     elif board == 'e1':
-        # Also requires sole candidate
+        # Also requires Naked_Single
         # 45 steps
         return     [[0, 0, 7, 0, 0, 2, 0, 4, 8],
                     [1, 2, 9, 8, 0, 0, 0, 0, 0],
@@ -188,7 +191,7 @@ def select_board(board):
     
 
     elif board == 'h1':
-        # Also requires unique candidate, + more
+        # Also requires Hidden Single, + more
         # 60 steps
         return [[0, 6, 0, 3, 0, 0, 0, 0, 0],
                 [9, 0, 0, 0, 6, 2, 0, 5, 0],
@@ -250,10 +253,10 @@ def tests():
     """
 
     # Very easy 1
-    board = select_board('h1')
+    board = select_board('e1')
     print_board(board)
 
-    for i in range(10):
+    for i in range(50):
         print('Step', i+1)
         board = solve_step(board)
         print(' ')
