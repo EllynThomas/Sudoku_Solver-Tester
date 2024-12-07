@@ -96,7 +96,7 @@ def select_board_steps(board):
     Selects the number of steps to solve a board
     """
     if board == 've1':
-        return 5
+        return 10
     elif board == 'e1':
         return 45
     elif board == 'h1':
@@ -109,20 +109,21 @@ def hard_1():
     """
     Hard 1
     """
-    board = select_board('h1')
-    print_board(board)
+    board = Board(select_board('e1'))
+    solution = select_board_solution('e1')
+    steps = select_board_steps('e1')
+    board.print_board()
 
-    for i in range(50):
+    for i in range(steps):
         print('Step', i+1)
-        board = solve_step(board)
+        if not solve_step(board):
+            print('No more steps')
+            break
         print(' ')
 
-        # print_board(board)
-        if check_valid_solution(board):
-            print('Solved')
-            break
-    print_board(board)
-    print('Matches solution? ' +  str(board == select_board_solution('h1')))
+
+    board.print_board()
+    print('Matches solution? ' +  str(str(board) == str(solution)))
 
 
 def tests():
