@@ -1,33 +1,6 @@
-from checks import *
+from utilities import *
 from rules import *
-
-def print_board(board):
-    """
-    Prints a sudoku board
-    """
-    print(''.join(['-' for i in range(25)]))
-    for i in range(9):
-        print('|', end = '')
-        for j in range(9):
-            print(f' {board[i][j]}', end = '')
-            if j % 3 == 2:
-                print(' |', end = '')
-        print()
-        if i % 3 == 2:
-            print(''.join(['-' for i in range(25)]))
-    
-    print()
-
-def place_number(board, coord, number):
-    """
-    Places a number in a cell on the board
-    """
-    if board[coord[0]][coord[1]] != 0:
-        print(f"Cell ({coord[0]}, {coord[1]}) already filled")
-        return board
-    
-    board[coord[0]][coord[1]] = number
-    return board
+from board import *
 
 
 
@@ -37,18 +10,11 @@ def solve_step(board):
     Solves a single step of a sudoku board.
     Prints what technique was used to solve the step
     The coordinates of the cell that was solved
-    And returns the new board
+    And returns True if a cell was solved, else False
     """
-    '''
-    # Check for Naked_Single
-    board, solved = sole_candidate(board)
-    if solved:
-        print("Naked_Single")
-        print(f"Solved cell: {solved}")
-        return board
-    '''
+    
     # Check for Last Free Cell and Naked_Single
-    rows, cols, sqrs = get_incomplete_sets(board)
+    rows, cols, sqrs = board.incomplete_houses()
     full_house = Full_House()
     naked_single = Naked_Single()
     hidden_single = Hidden_Single()
@@ -58,9 +24,10 @@ def solve_step(board):
         # Full House
         number, index = full_house.evaluate(row[0])
         if number:
-            print("Full House")
+            print(full_house)
             print(f"{number} in : ({row[1]}, {index})")
-            return place_number(board, (row[1], index), number)
+            board.place_number((row[1], index), number)
+            return True
         
         
         # Naked Single
@@ -69,27 +36,31 @@ def solve_step(board):
         for cell in incomplete_cells:
             number = naked_single.evaluate((row[1], cell), board)
             if number:
-                print("Naked_Single")
+                print(naked_single)
                 print(f"{number} in : ({row[1]}, {cell})")
-                return place_number(board, (row[1], cell), number)
+                board.place_number((row[1], cell), number)
+                return True
         
             
         # Hidden Single
         for cell in incomplete_cells:
             number = hidden_single.evaluate((row[1], cell), board)
             if number:
-                print("Hidden Single")
+                print(hidden_single)
                 print(f"{number} in : ({row[1]}, {cell})")
-                return place_number(board, (row[1], cell), number)
+                board.place_number((row[1], cell), number)
+                return True
        
     for col in cols:
-        # Last free cell
+        # Full House
         
         number, index = full_house.evaluate(col[0])
         if number:
-            print("Last free cell")
+            print(full_house)
             print(f"{number} in : ({index}, {col[1]})")
-            return place_number(board, (index, col[1]), number)
+            board.place_number((index, col[1]), number)
+            return True
+            
         
         # Naked_Single
         incomplete_cells = get_incomplete_cells_index(col[0])
@@ -97,54 +68,60 @@ def solve_step(board):
         for cell in incomplete_cells:
             number = naked_single.evaluate((cell, col[1]), board)
             if number:
-                print("Naked_Single")
+                print(naked_single)
                 print(f"{number} in : ({cell}, {col[1]})")
-                return place_number(board, (cell, col[1]), number)
+                board.place_number((cell, col[1]), number)
+                return True
+                
             
         # Hidden Single
         for cell in incomplete_cells:
             number = hidden_single.evaluate((cell, col[1]), board)
             if number:
-                print("Hidden Single")
+                print(hidden_single)
                 print(f"{number} in : ({cell}, {col[1]})")
-                return place_number(board, (cell, col[1]), number)
-     
-            
+                board.place_number((cell, col[1]), number)
+                return True
+                
+           
     for sqr in sqrs:
         # Last free cell
-        
         number, index = full_house.evaluate(sqr[0])
         if number:
-            coord = get_coord_from_square(sqr[1], index)
+            coord = board.sqr_coord(sqr[1], index)
             print("Last free cell")
             print(f"{number} in : ({coord[0]}, {coord[1]})")
-            return place_number(board, coord, number)
+            board.place_number(coord, number)
+            return True
         
         # Naked_Single
         incomplete_cells = get_incomplete_cells_index(sqr[0])
         
         for cell in incomplete_cells:
-            coord = get_coord_from_square(sqr[1], cell)
+            coord = board.sqr_coord(sqr[1], cell)
             number = naked_single.evaluate(coord, board)
             if number:
-                print("Naked_Single")
+                print("Naked Single")
                 print(f"{number} in : ({coord[0]}, {coord[1]})")
-                return place_number(board, coord, number)
+                board.place_number(coord, number)
+                return True
             
         # Hidden Single
         for cell in incomplete_cells:
-            coord = get_coord_from_square(sqr[1], cell)
+            coord = board.sqr_coord(sqr[1], cell)
             number = hidden_single.evaluate(coord, board)
             if number:
                 print("Hidden Single")
                 print(f"{number} in : ({coord[0]}, {coord[1]})")
-                return place_number(board, coord, number)
+                board.place_number(coord, number)
+                return True
 
 
+  
 
     # If no technique was used, return the board
     print("No technique used")
-    return board
+    return False
 
 
 
