@@ -109,9 +109,9 @@ def hard_1():
     """
     Hard 1
     """
-    board = Board(select_board('e1'))
-    solution = select_board_solution('e1')
-    steps = select_board_steps('e1')
+    board = Board(select_board('h1'))
+    solution = select_board_solution('h1')
+    steps = select_board_steps('h1')
     board.print_board()
 
     for i in range(steps):

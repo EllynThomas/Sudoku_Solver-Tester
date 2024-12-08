@@ -10,7 +10,6 @@ from templates import HouseRule, CellRule, PencilHouseRule, PencilCellRule
 ### House Techniques ###
 
 class Full_House(HouseRule):
-    # Full House Rule
     # Only one cell in a house is left to fill
     # returns number and index if true, else returns None
     def evaluate(self, house):
@@ -23,6 +22,17 @@ class Full_House(HouseRule):
     def __str__(self):
         return "Full House Rule"
     
+class Locked_Candidates(PencilHouseRule):
+    # If a number is only possible in a row or column in a square
+    # then it can be removed from the rest of the row or column
+    # returns list of indexes and number if true, else returns None
+    def evaluate(self, square_number, board):
+        unfilled_index = get_incomplete_cells_index(board.sqr(square_number))
+
+        
+
+        
+
 
 
 
@@ -32,7 +42,6 @@ class Full_House(HouseRule):
 ### Cell Techniques ###
 
 class Naked_Single(CellRule):
-    # Naked Single Rule
     # Only one number can go in a cell
     # returns number if true, else returns None
     def evaluate(self, coord, board):
@@ -46,7 +55,6 @@ class Naked_Single(CellRule):
 
 
 class Hidden_Single(CellRule):
-    # Hidden Single Rule
     # Only one cell in a row, column or square can contain a number
     # returns number if true, else returns None
     def evaluate(self, coord, board):

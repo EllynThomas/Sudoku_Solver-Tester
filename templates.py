@@ -29,8 +29,8 @@ class CellRule(ABC):
 class PencilHouseRule(ABC):
     """This is an abstract class for pencil marking rules that apply to a house. """
         
-    def evaluate(self, house):
-        """Evaluates the rule. Returns the list of possible numbers that can go in a cell"""
+    def evaluate(self, house, grid):
+        """Evaluates the rule. Returns True if the rule applies, else returns False"""
         pass
 
     def __str__(self):
@@ -41,7 +41,7 @@ class PencilCellRule(ABC):
     """This is an abstract class for pencil marking rules that apply to a single cell. """
         
     def evaluate(self, coord, grid):
-        """Evaluates the rule to a cell. Returns the list of possible numbers that can go in a cell"""
+        """Evaluates the rule to a cell. Returns True if the rule applies, else returns False"""
         pass
 
     def __str__(self):
