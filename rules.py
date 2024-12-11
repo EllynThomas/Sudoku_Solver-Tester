@@ -40,7 +40,8 @@ class Locked_Candidates_Square(PencilHouseRule):
             row_candidates.append(set(board.pencil_cell(coord) for coord in row_coords))
             col_candidates.append(set(board.pencil_cell(coord) for coord in col_coords))
 
-        
+
+        # Check if a number is only possible in one row or column
         for i in range(3):
             for candidate in row_candidates[i]:
                 if candidate not in row_candidates[(i + 1) % 3] and candidate not in row_candidates[(i + 2) % 3]:
