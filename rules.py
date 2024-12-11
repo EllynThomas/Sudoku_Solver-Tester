@@ -22,15 +22,56 @@ class Full_House(HouseRule):
     def __str__(self):
         return "Full House Rule"
     
-class Locked_Candidates(PencilHouseRule):
+class Locked_Candidates_Square(PencilHouseRule):
     # If a number is only possible in a row or column in a square
-    # then it can be removed from the rest of the row or column
-    # returns list of indexes and number if true, else returns None
+    # then it can be removed from the rest of square
+    # returns list of indices and number if true, else returns None
     def evaluate(self, square_number, board):
-        unfilled_index = get_incomplete_cells_index(board.sqr(square_number))
+
+        row_candidates = []
+        col_candidates = []
+        
+        for i in range(3):
+            # Get the coordinates of each row/column in the square
+            row_coords = [board.sqr_coord(square_number, i * 3 + j) for j in range(3)]
+            col_coords = [board.sqr_coord(square_number, i + j * 3) for j in range(3)]
+
+            # Get the pencil marks for each row/column
+            row_candidates.append(set(board.pencil_cell(coord) for coord in row_coords))
+            col_candidates.append(set(board.pencil_cell(coord) for coord in col_coords))
 
         
+        for i in range(3):
+            for candidate in row_candidates[i]:
+                if candidate not in row_candidates[(i + 1) % 3] and candidate not in row_candidates[(i + 2) % 3]:
+                    return [i * 3 + j for j in range(3)], candidate.pop()
+                if candidate not in col_candidates[(i + 1) % 3] and candidate not in col_candidates[(i + 2) % 3]:
+                    return [i + j * 3 for j in range(3)], candidate.pop()
 
+        return None, None
+    
+    def __str__(self):
+        return "Locked Candidates Rule"
+
+    def do(self, square_number, board, indices, number):
+        # Remove the number from the rest of the square
+        board_indices = []
+        for i in range(9): 
+            if i not in indices: board_indices.append(i)
+
+
+        for index in board_indices:
+            coord = board.sqr_coord(square_number, index)
+            board.remove_pencil(coord, number)        
+
+        
+class Locked_Candidates_Line(PencilHouseRule):
+    # If a number is only possible in one square in a row or column
+    # then it can be removed from the rest of the row/column
+    # returns list of indexes and number if true, else returns None
+
+    def evaluate(self, house, board):
+        pass
         
 
 
