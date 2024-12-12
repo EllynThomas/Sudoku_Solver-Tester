@@ -1,7 +1,7 @@
 [X] Change pencil marking to be an entire grid.
 [X] Update Naked Single and Hidden single rule to evaluate based off this grid.
 [ ] Create a general evaluate rule function.
-
+[ ] Stop the Locked Candidates Rule from repeating
 
 
 

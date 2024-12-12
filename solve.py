@@ -3,7 +3,23 @@ from rules import *
 from board import *
 
 
+def pencil_steps(board):
+    """
+    Goes through the rules that remove pencil marks.
+    Will repeat previously done steps, so needs to
+    be improved."""
 
+    locked_candidates_square = Locked_Candidates_Square()
+
+    for i in range(9):
+        indices, num = locked_candidates_square.evaluate(i, board)
+        if num:
+            print(locked_candidates_square)
+            print(f"{num} in square {i}")
+            locked_candidates_square.do(i, board, indices, num)
+            return True
+        
+        
 
 def solve_step(board):
     """
@@ -18,6 +34,7 @@ def solve_step(board):
     full_house = Full_House()
     naked_single = Naked_Single()
     hidden_single = Hidden_Single()
+
     
     for row in rows:
         

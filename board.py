@@ -97,7 +97,8 @@ class Board:
     
     def remove_pencil(self, coord, number):
         # Removes a pencil mark from a cell
-        self.pencil_grid[coord[0]][coord[1]].discard(number)
+        if self.pencil_grid[coord[0]][coord[1]] != 'F':
+            self.pencil_grid[coord[0]][coord[1]].discard(number)
 
     
     def prune_pencil(self, coord):

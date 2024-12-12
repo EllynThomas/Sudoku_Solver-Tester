@@ -117,8 +117,7 @@ def hard_1():
     for i in range(steps):
         print('Step', i+1)
         if not solve_step(board):
-            print('No more steps')
-            break
+            pencil_steps(board)
         print(' ')
 
 
